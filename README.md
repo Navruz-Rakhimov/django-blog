@@ -1,1 +1,1 @@
-# Basic poll application from [Django official tutorials](https://docs.djangoproject.com/en/3.2/intro/tutorial01/).
+# Django blog app from [Corey Schafer Django tutorial series on Youtube](https://www.youtube.com/playlist?list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p).
