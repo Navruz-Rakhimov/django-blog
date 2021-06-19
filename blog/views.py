@@ -1,16 +1,60 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Post
+from django.views import generic
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Create your views here.
 
 
-def home(request):
-    posts = Post.objects.all()
-    context = {
-        'posts': posts
-    }
-    return render(request, 'blog/home.html', context)
+class PostListView(generic.ListView):
+    model = Post
+    template_name = 'blog/home.html'
+    context_object_name = 'posts'
+    ordering = ['-date_posted']
+
+
+class PostDetailView(generic.DetailView):
+    model = Post
+
+
+class PostCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Post
+    fields = ['title', 'content']
+
+    def form_valid(self, form):
+        # every form has an instance - post in our case
+        # view class has 'request' attribute
+        # every view has 'request' parameter passed to it (class-based views also resolve to function)
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, generic.UpdateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name_suffix = '_update_form'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        post = self.get_object()
+        if post.author == self.request.user:
+            return True
+        return False
+
+
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, generic.DeleteView):
+    model = Post
+    success_url = '/'
+
+    def test_func(self):
+        post = self.get_object()
+        if post.author == self.request.user:
+            return True
+        return False
 
 
 def about(request):
