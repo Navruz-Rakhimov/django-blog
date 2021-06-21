@@ -39,6 +39,7 @@ class PostCreateView(LoginRequiredMixin, generic.CreateView):
         # every form has an instance - post in our case
         # view class has 'request' attribute
         # every view has 'request' parameter passed to it (class-based views also resolve to function)
+        # setting the author of the post
         form.instance.author = self.request.user
         return super().form_valid(form)
 
